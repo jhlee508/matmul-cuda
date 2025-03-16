@@ -83,6 +83,7 @@ float *alloc_mat(int R, int C) {
 }
 
 void rand_mat(float *m, int R, int C) {
+  srand(123);
   for (int i = 0; i < R; i++) {
     for (int j = 0; j < C; j++) {
       m[i * C + j] = (float) rand() / RAND_MAX - 0.5;

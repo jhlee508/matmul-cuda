@@ -68,41 +68,40 @@ static void parse_opt(int argc, char **argv) {
 int main(int argc, char **argv) {
   parse_opt(argc, argv);
 
-  printf("Initializing..."); fflush(stdout);
+  printf("Allocating..."); fflush(stdout);
   float *A = alloc_mat(M, K);
   float *B = alloc_mat(K, N);
   float *C = alloc_mat(M, N);
-  rand_mat(A, M, K);
-  rand_mat(B, K, N);
-  matmul_initialize(A, B, M, N, K);
-  cublas_initialize();
   printf("Done!\n"); fflush(stdout);
 
   if (warmup) {
     printf("Warmup..."); fflush(stdout);
     for (int i = 0; i < 3; ++i) {
-      zero_mat(C, M, N);
+      matmul_initialize(A, B, M, N, K);
       matmul(A, B, C, M, N, K);
-      zero_mat(C, M, N);
+      matmul_finalize(C, M, N, K);
+      
+      cublas_initialize();
+      matmul_initialize(A, B, M, N, K);
       matmul_cublas(A, B, C, M, N, K);
+      matmul_finalize(C, M, N, K);
+      cublas_finalize();
     }
     printf("Done!\n"); fflush(stdout);
   }
 
-  /* Calculate my matmul performance */
-  double elapsed_time_sum = 0;
-  for (int i = 0; i < num_iterations; ++i) {
-    printf("Calculating (iter=%d)...", i); fflush(stdout);
-    zero_mat(C, M, N);
-    double start_time = get_time();
-    matmul(A, B, C, M, N, K);
-    double elapsed_time = get_time() - start_time;
-    printf("%f sec\n", elapsed_time);
-    elapsed_time_sum += elapsed_time;
-  }
-
   /* Calculate cuBLAS matmul performance */
+  printf("Initializing matrices..."); fflush(stdout);
+  rand_mat(A, M, K);
+  rand_mat(B, K, N);
+  zero_mat(C, M, N);
+  printf("Done!\n"); fflush(stdout);
+
   double cublas_elapsed_time_sum = 0;
+  printf("Initializing cuBLAS..."); fflush(stdout);
+  matmul_initialize(A, B, M, N, K);
+  cublas_initialize();
+  printf("Done!\n"); fflush(stdout);
   for (int i = 0; i < num_iterations; ++i) {
     printf("Calculating cuBLAS (iter=%d)...", i); fflush(stdout);
     zero_mat(C, M, N);
@@ -112,6 +111,34 @@ int main(int argc, char **argv) {
     printf("%f sec\n", elapsed_time);
     cublas_elapsed_time_sum += elapsed_time;
   }
+  printf("Finalizing cuBLAS..."); fflush(stdout);
+  matmul_finalize(C, M, N, K);
+  cublas_finalize();
+  printf("Done!\n"); fflush(stdout);
+
+  /* Calculate my matmul performance */
+  printf("Initializing matrices..."); fflush(stdout);
+  rand_mat(A, M, K);
+  rand_mat(B, K, N);
+  zero_mat(C, M, N);
+  printf("Done!\n"); fflush(stdout);
+
+  double elapsed_time_sum = 0;
+  printf("Initializing..."); fflush(stdout);
+  matmul_initialize(A, B, M, N, K);
+  printf("Done!\n"); fflush(stdout);
+  for (int i = 0; i < num_iterations; ++i) {
+    printf("Calculating (iter=%d)...", i); fflush(stdout);
+    zero_mat(C, M, N);
+    double start_time = get_time();
+    matmul(A, B, C, M, N, K);
+    double elapsed_time = get_time() - start_time;
+    printf("%f sec\n", elapsed_time);
+    elapsed_time_sum += elapsed_time;
+  }
+  printf("Finalizing..."); fflush(stdout);
+  matmul_finalize(C, M, N, K);
+  printf("Done!\n"); fflush(stdout);
 
   if (print_matrix) {
     printf("MATRIX A:\n"); print_mat(A, M, K);
@@ -119,22 +146,19 @@ int main(int argc, char **argv) {
     printf("MATRIX C:\n"); print_mat(C, M, N);
   }
 
-  matmul_finalize(C, M, N, K);
-  cublas_finalize();
-
   if (validation) {
     check_matmul(A, B, C, M, N, K);
   }
 
-  double elapsed_time_avg = elapsed_time_sum / num_iterations;
-  printf("> Avg. elapsed time: %f sec\n", elapsed_time_avg);
-  printf("> Avg. throughput: %f GFLOPS\n", 2.0 * M * N * K / elapsed_time_avg / 1e9);
-
   double cublas_elapsed_time_avg = cublas_elapsed_time_sum / num_iterations;
   printf("> Avg. elapsed time (cuBLAS): %f sec\n", cublas_elapsed_time_avg);
-  printf("> Avg. throughput (cuBLAS): %f GFLOPS\n", 2.0 * M * N * K / cublas_elapsed_time_avg / 1e9);
+  printf("> Avg. throughput (cuBLAS): %.1f GFLOPS\n", 2.0 * M * N * K / cublas_elapsed_time_avg / 1e9);
   
-  printf("> Perf. against cuBLAS: %.2f %%\n", cublas_elapsed_time_avg / elapsed_time_avg);
+  double elapsed_time_avg = elapsed_time_sum / num_iterations;
+  printf("> Avg. elapsed time: %f sec\n", elapsed_time_avg);
+  printf("> Avg. throughput: %.1f GFLOPS\n", 2.0 * M * N * K / elapsed_time_avg / 1e9);
+  
+  printf("> Perf. against cuBLAS: %.1f %%\n", cublas_elapsed_time_avg / elapsed_time_avg * 100);
 
   return 0;
 }
