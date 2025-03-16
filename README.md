@@ -24,6 +24,16 @@ Kernel                               | GFLOPS      | Perf. against cuBLAS (%)
 8: Warp Tiling                       |             | 
 0: cuBLAS                            | `14205.7`   | 100.0
 
+## Usage
+### Build
+```bash
+$ make
+```
+### Run
+```bash
+$ run.sh
+```
+
 
 ## References
 - https://siboehm.com/articles/22/CUDA-MMM
