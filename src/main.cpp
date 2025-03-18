@@ -28,7 +28,7 @@ static int num_iterations = 1;
 
 static void parse_opt(int argc, char **argv) {
   int c;
-  while ((c = getopt(argc, argv, "pvwh:n:")) != -1) {
+  while ((c = getopt(argc, argv, "pvwhn:")) != -1) {
     switch (c) {
       case 'p':
         print_matrix = true;
