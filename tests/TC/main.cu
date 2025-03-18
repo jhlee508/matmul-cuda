@@ -1,7 +1,7 @@
-#include <cuda_fp16.h>
-#include <mma.h>
-#include <sys/time.h>
 #include <stdio.h>
+#include <sys/time.h>
+#include <mma.h>
+#include <cuda_fp16.h>
 
 using namespace nvcuda;
 using namespace std;
