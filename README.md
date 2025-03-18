@@ -2,7 +2,7 @@
 A step-by-step optimization of matrix multiplication using CUDA to achieve cuBLAS-level performance.
 
 
-## Environment
+## Setup
 ### System
 - 1 x NVIDIA Tesla V100 32GB (Peak FP32 GFLOPS: `15700`)
 
@@ -27,13 +27,24 @@ Kernel                               | GFLOPS      | Perf. against cuBLAS (%)
 ## Usage
 ### Build
 ```bash
-$ make
+$ make -j8
 ```
 ### Run
 ```bash
-$ run.sh
+$ ./main 4096 4096 4096 -w -n 5 -v
 ```
-
+```
+Usage: main [-p] [-v] [-w] [-h] [-n 'num_iterations'] M N K
+Options:
+  -p : print matrix data. (default: off)
+  -v : validate matrix multiplication. (default: off)
+  -w : warmup. (default: off)
+  -h : print this page.
+  -n : number of iterations (default: 1)
+   M : number of rows of matrix A and C. (default: 8)
+   N : number of columns of matrix B and C. (default: 8)
+   K : number of columns of matrix A and rows of B. (default: 8)
+```
 
 ## References
 - https://siboehm.com/articles/22/CUDA-MMM

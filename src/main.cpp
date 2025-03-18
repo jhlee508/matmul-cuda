@@ -4,7 +4,7 @@
 #include <stdlib.h>
 
 #include "util.h"
-#include "matmul.h"
+#include "matmul.cuh"
 
 
 static void print_help(const char* prog_name) {
