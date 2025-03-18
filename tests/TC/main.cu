@@ -70,9 +70,9 @@ int main(){
 
 	double elapsed_time = end - start;
 	printf("> Elapsed time: %f sec\n", elapsed_time);
-	printf("> TFLOPS: %.1f\n", (double)(M * N * K * 2) * (numWMMAOps) * 
-												     (numThreadsPerBlock / numThreadsPerWarp) * 
-												     (numThreadBlock) / elapsed_time / 1e12);
+	printf("> TFLOPS: %.1f\n", (double)(M * N * K * 2) * 
+		(numWMMAOps) * (numThreadsPerBlock / numThreadsPerWarp) * 
+		(numThreadBlock) / elapsed_time / 1e12);
 
 	return 0;
 }
