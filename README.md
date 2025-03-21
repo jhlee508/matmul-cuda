@@ -13,7 +13,7 @@ A step-by-step optimization of matrix multiplication using CUDA to achieve cuBLA
 The matrix size is determined by setting the dimensions M, N, and K to `4096`.
 
 Kernel                               | GFLOPS      | Perf. against cuBLAS (%)
------------------------------------- | ----------- | -------------------------
+:------------------------------------|:-----------:|:------------------------:
 1: Naive                             | `245.7`     | 1.7
 2: GMEM Coalescing                   | `2311.7`    | 16.3
 3: SMEM Caching                      | `4263.2`    | 30.0
